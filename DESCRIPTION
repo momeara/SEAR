@@ -1,0 +1,24 @@
+Package: SEAR
+Type: Package
+Version: 0.0.0.9000
+Title: R Tools for working with the Similarity Ensemble Approach Program
+Description: SEA is a method for comparing targets by their ligands
+Authors@R: person("Matthew", "O'Meara", email = "mattjomeara@gmail.com",
+    role = c("aut", "cre"))
+URL: http://github.com/momeara/SEAR
+BugReports: https://github.com/momeara/SEAR/issues
+Depends:
+    R (>= 3.1.2)
+Imports:
+    assertthat,
+    assertr,
+    plyr,
+    dplyr,
+    magrittr,
+    stringr,
+    httr,
+    readr,
+License: MIT + file LICENSE
+Collage: 'r_utils.R'
+    'io.R'
+RoxygenNote: 5.0.1
