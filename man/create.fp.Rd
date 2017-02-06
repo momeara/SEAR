@@ -3,21 +3,15 @@
 \name{create.fp}
 \alias{create.fp}
 \title{create a fingerprint file for the given file or data frame with columns [compound, smiles]
-return based on the read parameter
-  read == 'none' -> return NULL
-  read == 'fname' -> return the filename of the generated fingerprint file
-  read == 'compound' -> return just the list of compounds in the fingerprint file
-  read == 'full' -> read in the full fingerprint file}
+return based on the read parameter}
 \usage{
-create.fp(smi, read = c("none", "fname", "compound", "full"),
-  compound = "compound", smiles = "smiles", output_fname = NULL)
+create.fp(smi, compound = "compound", smiles = "smiles",
+  output_fname = NULL, fp_format = c("sea_native", "bitstring"),
+  fp_type = c("rdkit_ecfp", "rdkit_path", "rdkit_ecfp_mask"),
+  standardize = T, verbose = F)
 }
 \description{
 create a fingerprint file for the given file or data frame with columns [compound, smiles]
 return based on the read parameter
-  read == 'none' -> return NULL
-  read == 'fname' -> return the filename of the generated fingerprint file
-  read == 'compound' -> return just the list of compounds in the fingerprint file
-  read == 'full' -> read in the full fingerprint file
 }
 

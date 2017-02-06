@@ -9,7 +9,7 @@
 \usage{
 write.set(set, fname, target = "target", name = "name",
   compound = "compound", affinity = "affinity",
-  description = "description")
+  description = "description", seaware_format = T)
 }
 \description{
 warning note the order of the columns in the input idfferes in the order of the output

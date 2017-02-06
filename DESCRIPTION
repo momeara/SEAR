@@ -12,12 +12,14 @@ Depends:
 Imports:
     assertthat,
     assertr,
-    plyr,
+    httr,
+    data.table,
     dplyr,
     magrittr,
-    stringr,
-    httr,
+    plyr,
     readr,
+    stringr,
+    tidyr,
 License: MIT + file LICENSE
 Collage: 'r_utils.R'
     'io.R'
