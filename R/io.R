@@ -70,6 +70,7 @@ check_duplicates.smi <-function(smi, smiles="smiles", compound="compound") {
 	}
 }
 
+#' @export
 clean_duplicates.smi <- function(smi, smiles="smiles", compound="compound"){
 	smi %>%
 		dplyr::group_by_(compound) %>%
