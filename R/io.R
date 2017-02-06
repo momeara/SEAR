@@ -2,7 +2,8 @@
 # vi: set ts=2 noet:
 
 
-#returns data.frame with columns [smiles, compound]
+#' returns data.frame with columns [smiles, compound]
+#' @export
 read.smi <- function(fname, smiles="smiles", compound="compound"){
 	require(data.table)
 	require(plyr)
@@ -17,10 +18,11 @@ read.smi <- function(fname, smiles="smiles", compound="compound"){
 }
 
 
-#input data.frame with columns [smiles, compound]
-#write .smi file to given fname
-#
-#filter unique compound identifiers
+#' input data.frame with columns [smiles, compound]
+#' write .smi file to given fname
+#'
+#' filter unique compound identifiers
+#' @export
 write.smi <- function(smi, fname, smiles="smiles", compound="compound"){
 	require(plyr)
 	require(dplyr)
@@ -60,6 +62,7 @@ write.smi <- function(smi, fname, smiles="smiles", compound="compound"){
 		col.names=F)
 }
 
+#' @export
 write.singleton.set <- function(smi, fname, target="compound", name="compound", compound="compound"){
 	if( !(target %in% names(smi))){
 		stop(paste0("ERROR: cannot write .set file '", fname, "' because the input data.frame does not have column '", target, "'\n\t data.frame columns: [", paste(names(smi), collapse=", "), "\n\trequired columns: [", paste(unique(target, name, compound), collapse=", "), "]"))
@@ -88,8 +91,9 @@ write.singleton.set <- function(smi, fname, target="compound", name="compound", 
 		col.names=F)
 }
 
-#returns data.frame with columns [target, name, compound]
-# if unpack_compounds, put each compound on separate row
+#' returns data.frame with columns [target, name, compound]
+#' if unpack_compounds, put each compound on separate row
+#' @export
 read.set <- function(
 	fname,
 	target="target",
@@ -113,15 +117,16 @@ read.set <- function(
 	sets
 }
 
-# INPUT:
-#   set: data.frame with columns [target, name, affinity, description, compound]
-#        if affinity and description are not present, assume it is the old style
-#        format and don't write them out.
-#
-#        warning note the order of the columns in the input idfferes in the order of the output
-#   set_fname: .set file name
-# OUTPUT:
-#   creates <set_fname>
+#' INPUT:
+#'   set: data.frame with columns [target, name, affinity, description, compound]
+#'        if affinity and description are not present, assume it is the old style
+#'        format and don't write them out.
+#'
+#'        warning note the order of the columns in the input idfferes in the order of the output
+#'   set_fname: .set file name
+#' OUTPUT:
+#'   creates <set_fname>
+#' @export
 write.set <- function(
 	set,
 	fname,
@@ -200,12 +205,13 @@ write.set <- function(
 }
 
 
-# create a fingerprint file for the given file or data frame with columns [compound, smiles]
-# return based on the read parameter
-#   read == 'none' -> return NULL
-#   read == 'fname' -> return the filename of the generated fingerprint file
-#   read == 'compound' -> return just the list of compounds in the fingerprint file
-#   read == 'full' -> read in the full fingerprint file
+#' create a fingerprint file for the given file or data frame with columns [compound, smiles]
+#' return based on the read parameter
+#'   read == 'none' -> return NULL
+#'   read == 'fname' -> return the filename of the generated fingerprint file
+#'   read == 'compound' -> return just the list of compounds in the fingerprint file
+#'   read == 'full' -> read in the full fingerprint file
+#' @export
 create.fp <- function(
 	smi,
 	read=c("none", "fname", "compound", "full"),
@@ -252,6 +258,7 @@ create.fp <- function(
 	}
 }
 
+#' @export
 read.fp <- function(fname, fingerprint="fingerprint", compound="compound"){
 	require(sqldf)
 	if(!is.character(fname) | !file.exists(fname)){
@@ -262,6 +269,7 @@ read.fp <- function(fname, fingerprint="fingerprint", compound="compound"){
 	fp
 }
 
+#' @export
 read.fp.compound <- function(fname, compound="compound"){
 	require(sqldf)
 	if(!is.character(fname) | !file.exists(fname)){
@@ -272,6 +280,7 @@ read.fp.compound <- function(fname, compound="compound"){
 	fp
 }
 
+#' @export
 write.fp <- function(fp, fname, fingerprint="fingerprint", compound="compound"){
 	if( !(fingerprint %in% names(fp))){
 		stop(paste0("ERROR: cannot write .fp file '", fname, "' because the input data.frame does not have column '", fingerprint, "'\n\t data.frame columns: [", paste(names(fp), collapse=", "), "]\n\trequired columns: [", fingerprint, ", ", compound, "]"))
@@ -298,6 +307,7 @@ write.fp <- function(fp, fname, fingerprint="fingerprint", compound="compound"){
 }
 
 
+#' @export
 read.scores <- function(fname, use_cache=T){
 	if(!is.character(fname) || !file.exists(fname)){
 		stop(paste("ERROR: The SEA .scores.csv file, '", fname, "', does not exist.", sep=""))
@@ -337,6 +347,7 @@ read.scores <- function(fname, use_cache=T){
 	scores
 }
 
+#' @export
 write.scores <- function(scores, fname){
 	write.table(
 		scores,
