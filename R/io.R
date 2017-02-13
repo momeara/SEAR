@@ -8,7 +8,6 @@
 #' so as to take presidence over other specified configuration options
 #' @export
 write.config_files <- function(fitcore=NULL, fpcore=NULL, seacore=NULL, sea_interface=NULL){
-  library(readr)
   config_files = as.list(match.call())
   for( config_name in names(config_files)[-1] ){
       config_fname <-paste( getwd(), "/", config_name, ".cfg", sep="")
@@ -68,6 +67,7 @@ check_duplicates.smi <-function(smi, smiles="smiles", compound="compound") {
 		print(duplicates %>% head(20) %>% as.data.frame)
 		cat("WARNING: You can removed duplicates by running clean_duplicates.smi\n")
 	}
+	smi
 }
 
 #' @export
@@ -88,10 +88,8 @@ read.smi <- function(fname, smiles="smiles", compound="compound"){
 	if(!is.character(fname) | !file.exists(fname)){
 		stop(paste("ERROR: The SEA .smi file, '", fname, "', does not exist.", sep=""))
 	}
-	z <- data.table::fread(fname, sep=";", header=F, data.table=F)
-	data.table::setnames(z, c(smiles, compound))
-	check_duplicates.smi(z)
-	z
+	readr::read_delim(fname, delim=";", col_names=c(smiles, compound)) %>%
+		check_duplicates.smi
 }
 
 
@@ -235,6 +233,7 @@ write.singleton.set <- function(smi, fname, target="compound", name="compound", 
 		col.names=F)
 }
 
+#' @export
 pack.library <- function(
 	molecules,
 	targets,
@@ -329,7 +328,7 @@ unpack.library <- function(
 	list(molecules=molecules, targets=targets)
 }
 
-
+#' @export
 plot_fits.library <- function(
 	library_fname,
 	diagnostics_fname=library_fname,
@@ -355,6 +354,7 @@ plot_fits.library <- function(
 	}
 }
 
+#' @export
 set_fit.library <- function(
 	library_fname,
 	threshold=.28,
@@ -631,29 +631,30 @@ write.scores <- function(scores, fname){
 		col.names=F)
 }
 
-# run SEA
-#
-# inputs:
-#   background_fname: filename of .fit file
-#   ref_set: compound sets for reference targets
-#     path to .set file or
-#     data.frame with columns [target, name, compound]
-#   ref_smi: compounds for reference targets
-#     path to .smi file or
-#     data.frame with columns [compound, smiles]
-#   query_set: compound sets for query targets
-#     path to .set file or
-#     data.frame with columns [target, name, compound]
-#   query_smi: compounds for query targets
-#     path to .smi file or
-#     data.frame with columns [compound, smiles]
-#   run_tag: a tag given help identify the sea analysis in the SEA viewer
-#     default NULL
-#   output_base: path and file prefix where the files should be written
-#     default to a temporary file
-
-# Output:
-#   data.frame with columns [target1, target2, EValue, MaxTC] for SEA associations
+#' run SEA
+#'
+#' inputs:
+#'   background_fname: filename of .fit file
+#'   ref_set: compound sets for reference targets
+#'     path to .set file or
+#'     data.frame with columns [target, name, compound]
+#'   ref_smi: compounds for reference targets
+#'     path to .smi file or
+#'     data.frame with columns [compound, smiles]
+#'   query_set: compound sets for query targets
+#'     path to .set file or
+#'     data.frame with columns [target, name, compound]
+#'   query_smi: compounds for query targets
+#'     path to .smi file or
+#'     data.frame with columns [compound, smiles]
+#'   run_tag: a tag given help identify the sea analysis in the SEA viewer
+#'     default NULL
+#'   output_base: path and file prefix where the files should be written
+#'     default to a temporary file
+#'
+#' Output:
+#'   data.frame with columns [target1, target2, EValue, MaxTC] for SEA associations
+#' export
 run.sea <- function(
 	background_fname,
 	ref_set,
@@ -748,15 +749,16 @@ run.sea <- function(
 
 
 
-# build redirect urls into the sea viewer a list of target pairs
-#
-#  sea_locator_url: url to the locate_association.php script
-#    you may need to copy this file into the sea viewer base directory.
-#  sea_analsis_id: each sea run is assigned an analysis id
-#  query_targets, reference_targets: vectors of target codes
-#  flip: if true put the query target downstairs
-#  return:
-#     a character vector of urls into the SEA viewer
+#' build redirect urls into the sea viewer a list of target pairs
+#'
+#'  sea_locator_url: url to the locate_association.php script
+#'    you may need to copy this file into the sea viewer base directory.
+#'  sea_analsis_id: each sea run is assigned an analysis id
+#'  query_targets, reference_targets: vectors of target codes
+#'  flip: if true put the query target downstairs
+#'  return:
+#'     a character vector of urls into the SEA viewer
+#' @export
 sea_viewer_locator <- function(
 	query_targets,
 	query_activity_thresholds,
