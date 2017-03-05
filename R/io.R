@@ -325,7 +325,7 @@ unpack.library <- function(
 
 	if(unpack_compounds){
 		targets <- targets %>%
-			transform(compound = stingr::str_split(compound, ":")) %>%
+			transform(compound = stringr::str_split(compound, ":")) %>%
 			tidyr::unnest(compound)
 	}
 	list(molecules=molecules, targets=targets)
@@ -713,7 +713,7 @@ run.sea <- function(
 	}
 
 	if(is.character(query_set)){
-		if(!stingr::str_detect(query_set, ".set$")){
+		if(!stringr::str_detect(query_set, ".set$")){
 			cat("WARNING: query .set file '", query_set, "', does not end in '.set'\n", sep="")
 		}
 		query_set_fname <- query_set
