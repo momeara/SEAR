@@ -7,8 +7,8 @@ for one of the sea config files.
 these are written to the current working directory so they can be parsed
 so as to take presidence over other specified configuration options}
 \usage{
-write.config_files(fitcore = NULL, fpcore = NULL, seacore = NULL,
-  sea_interface = NULL)
+write.config_files(dir = getwd(), fitcore = NULL, fpcore = NULL,
+  seacore = NULL, sea_interface = NULL)
 }
 \description{
 Config files should be a list <config_fname>=<config_file_contents>
