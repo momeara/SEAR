@@ -2,7 +2,8 @@
 % Please edit documentation in R/io.R
 \name{write.smi}
 \alias{write.smi}
-\title{input data.frame with columns [smiles, compound]
+\title{Write a smiles file
+input data.frame with columns [smiles, compound]
 write .smi file to given fname}
 \usage{
 write.smi(smi, fname, smiles = "smiles", compound = "compound",

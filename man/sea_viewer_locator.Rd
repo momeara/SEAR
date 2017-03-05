@@ -2,7 +2,8 @@
 % Please edit documentation in R/io.R
 \name{sea_viewer_locator}
 \alias{sea_viewer_locator}
-\title{build redirect urls into the sea viewer a list of target pairs}
+\title{Locate the SEA viewer
+build redirect urls into the sea viewer a list of target pairs}
 \usage{
 sea_viewer_locator(query_targets, query_activity_thresholds, reference_targets,
   reference_activity_thresholds,

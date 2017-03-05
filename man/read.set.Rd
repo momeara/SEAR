@@ -2,13 +2,15 @@
 % Please edit documentation in R/io.R
 \name{read.set}
 \alias{read.set}
-\title{returns data.frame with columns [target, name, compound]
+\title{Read a set file
+returns data.frame with columns [target, name, compound]
 if unpack_compounds, put each compound on separate row}
 \usage{
 read.set(fname, target = "target", name = "name", compound = "compound",
   unpack_compounds = T)
 }
 \description{
+Read a set file
 returns data.frame with columns [target, name, compound]
 if unpack_compounds, put each compound on separate row
 }

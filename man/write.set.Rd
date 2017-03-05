@@ -2,7 +2,8 @@
 % Please edit documentation in R/io.R
 \name{write.set}
 \alias{write.set}
-\title{INPUT:
+\title{Write a set file
+INPUT:
   set: data.frame with columns [target, name, affinity, description, compound]
        if affinity and description are not present, assume it is the old style
        format and don't write them out.}

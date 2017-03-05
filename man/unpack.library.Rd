@@ -2,7 +2,7 @@
 % Please edit documentation in R/io.R
 \name{unpack.library}
 \alias{unpack.library}
-\title{unpack a library
+\title{Unpack a SEA library
 returns: list(molecules, targets) where
   molecules is a data.frame with columns: compound, smiles, fingerprint
   targets is a data.frame with columns: target, name, affinity, compound, description}

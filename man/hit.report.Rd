@@ -2,11 +2,13 @@
 % Please edit documentation in R/io.R
 \name{hit.report}
 \alias{hit.report}
-\title{scores is a data.frame with columns target1, target2 as uniprot_entries}
+\title{Generate a hit report using the BioChemPantry
+scores is a data.frame with columns target1, target2 as uniprot_entries}
 \usage{
 hit.report(hits)
 }
 \description{
+Generate a hit report using the BioChemPantry
 scores is a data.frame with columns target1, target2 as uniprot_entries
 }
 

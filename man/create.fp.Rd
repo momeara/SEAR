@@ -2,7 +2,8 @@
 % Please edit documentation in R/io.R
 \name{create.fp}
 \alias{create.fp}
-\title{create a fingerprint file for the given file or data frame with columns [compound, smiles]
+\title{create a fingerprint file
+given file or data frame with columns [compound, smiles]
 return based on the read parameter}
 \usage{
 create.fp(smi, compound = "compound", smiles = "smiles",
@@ -11,7 +12,8 @@ create.fp(smi, compound = "compound", smiles = "smiles",
   standardize = T, verbose = F)
 }
 \description{
-create a fingerprint file for the given file or data frame with columns [compound, smiles]
+create a fingerprint file
+given file or data frame with columns [compound, smiles]
 return based on the read parameter
 }
 

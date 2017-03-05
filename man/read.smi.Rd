@@ -2,11 +2,13 @@
 % Please edit documentation in R/io.R
 \name{read.smi}
 \alias{read.smi}
-\title{returns data.frame with columns [smiles, compound]}
+\title{Read a smiles file
+returns data.frame with columns [smiles, compound]}
 \usage{
 read.smi(fname, smiles = "smiles", compound = "compound")
 }
 \description{
+Read a smiles file
 returns data.frame with columns [smiles, compound]
 }
 

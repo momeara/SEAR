@@ -2,8 +2,8 @@
 % Please edit documentation in R/io.R
 \name{combine.smi}
 \alias{combine.smi}
-\title{combine compounds together, removing duplicates -- warn if there are
-different smiles strings for the same compound}
+\title{Combine compounds together, removing duplicates
+warn if there are different smiles strings for the same compound}
 \usage{
 combine.smi(smis, smiles = "smiles", compound = "compound")
 }

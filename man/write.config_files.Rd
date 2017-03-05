@@ -2,7 +2,8 @@
 % Please edit documentation in R/io.R
 \name{write.config_files}
 \alias{write.config_files}
-\title{Config files should be a list <config_fname>=<config_file_contents>
+\title{Write SEA config files
+Config files should be a list <config_fname>=<config_file_contents>
 for one of the sea config files.
 these are written to the current working directory so they can be parsed
 so as to take presidence over other specified configuration options}
@@ -11,6 +12,7 @@ write.config_files(dir = getwd(), fitcore = NULL, fpcore = NULL,
   seacore = NULL, sea_interface = NULL)
 }
 \description{
+Write SEA config files
 Config files should be a list <config_fname>=<config_file_contents>
 for one of the sea config files.
 these are written to the current working directory so they can be parsed
