@@ -253,33 +253,60 @@ pack.library <- function(
 		library_fname <- paste0(tmp_base, ".sea")
 	}
 
+	if(verbose){
+		cat("Writing molecules to '", molecules_fname, "' ...\n", sep="")
+	}
 	write.smi(molecules, molecules_fname)
+	if(verbose){
+		cat("Writing targets to '", targets_fname, "' ...\n", sep="")
+	}
 	write.set(targets, targets_fname)
 
-	do.call(write.config_files, c(dir=getwd(), config_files))
+	if(!is.null(config_files)){
+		if(verbose){
+			cat("Writing config files ...\n", sep="")
+		}
+		do.call(write.config_files, c(dir=getwd(), config_files))
+	}
 
 	cmd <- paste(
 		"SeaShell library pack",
 		"--generate-fingerprint", fingerprint_type,
-		ifelse(!is.null(name), paste("--name", shQuote(name)), ""),
+		ifelse(!is.null(name), paste0("--name=", shQuote(name)), ""),
 		library_fname, molecules_fname, targets_fname)
 	if(verbose){
 		cat(cmd, "\n", sep="")
 	}
 
-	system(cmd)
+	return_val <- system(cmd)
 #	file.remove(molecules_fname)
 #	file.remove(targets_fname)
 #	cleanup.config_files()
 	library_fname
 }
 
+#' Parse SEA Fit file
+#' @return list
+#' @export
+parse_fit_file <- function(fit_file){
+	x <- readr::read_lines(fit_file)
+	parse_line <- . %>%
+		stringr::str_split("\t") %>%
+		magrittr::extract2(1) %>%    # flatten matches
+		magrittr::extract(-1) %>%    # remove line tag
+		purrr::map(as.numeric) %>%
+		purrr::flatten_dbl()
+	list(
+		tanimoto_threshold = x[4] %>% parse_line,
+		mu = x[5] %>% parse_line,
+		sigma = x[5] %>% parse_line)
+}
 
 #' Unpack a SEA library
-#' returns: list(molecules, targets) where
+#' returns: list(molecules, targets, fit) where
 #'   molecules is a data.frame with columns: compound, smiles, fingerprint
 #'   targets is a data.frame with columns: target, name, affinity, compound, description
-#'
+#'   fit is a list of this form
 #' Note: the molecules and targets tables are joined on the compound in the molecules and targets is the join column
 #' @export
 unpack.library <- function(
@@ -287,6 +314,7 @@ unpack.library <- function(
 	fingerprint_format="sea_native",
 	molecules_fname = NULL,
 	targets_fname = NULL,
+	fit_fname = NULL,
 	unpack_compounds=TRUE,
 	verbose=FALSE){
 
@@ -302,7 +330,13 @@ unpack.library <- function(
 		targets_fname <- paste0(tempfile(), ".set")
 	}
 
-	cmd <- paste("SeaShell library unpack --yes --fingerprint-format", fingerprint_format, fname, molecules_fname, targets_fname)
+	if(is.null(fit_fname)){
+		fit_fname <- paste0(tempfile(), ".fit")
+	}
+
+	cmd <- paste(
+			"SeaShell library unpack --yes --fingerprint-format", fingerprint_format,
+			fname, molecules_fname, targets_fname, fit_fname)
 	if(verbose){
 			cat("Unpacking targets and molecules form '", fname, "'\n", sep="")
 			cat(cmd, "\n", sep="")
@@ -323,12 +357,14 @@ unpack.library <- function(
 			compound=molecules,
 			description)
 
+	fit <- parse_fit_file(fit_fname)
+
 	if(unpack_compounds){
 		targets <- targets %>%
 			transform(compound = stringr::str_split(compound, ":")) %>%
 			tidyr::unnest(compound)
 	}
-	list(molecules=molecules, targets=targets)
+	list(molecules=molecules, targets=targets, fit=fit)
 }
 
 #' Fit a library and generate plots

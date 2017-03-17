@@ -3,15 +3,22 @@
 \name{unpack.library}
 \alias{unpack.library}
 \title{Unpack a SEA library
-returns: list(molecules, targets) where
+returns: list(molecules, targets, fit) where
   molecules is a data.frame with columns: compound, smiles, fingerprint
-  targets is a data.frame with columns: target, name, affinity, compound, description}
+  targets is a data.frame with columns: target, name, affinity, compound, description
+  fit is a list of this form
+Note: the molecules and targets tables are joined on the compound in the molecules and targets is the join column}
 \usage{
 unpack.library(fname, fingerprint_format = "sea_native",
-  molecules_fname = NULL, targets_fname = NULL, unpack_compounds = TRUE,
-  verbose = FALSE)
+  molecules_fname = NULL, targets_fname = NULL, fit_fname = NULL,
+  unpack_compounds = TRUE, verbose = FALSE)
 }
 \description{
+Unpack a SEA library
+returns: list(molecules, targets, fit) where
+  molecules is a data.frame with columns: compound, smiles, fingerprint
+  targets is a data.frame with columns: target, name, affinity, compound, description
+  fit is a list of this form
 Note: the molecules and targets tables are joined on the compound in the molecules and targets is the join column
 }
 
