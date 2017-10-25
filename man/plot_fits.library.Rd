@@ -10,4 +10,3 @@ plot_fits.library(library_fname, diagnostics_fname = library_fname,
 \description{
 Fit a library and generate plots
 }
-

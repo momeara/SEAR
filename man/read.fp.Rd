@@ -9,4 +9,3 @@ read.fp(fname, fingerprint = "fingerprint", compound = "compound")
 \description{
 Read a fingerprints file
 }
-

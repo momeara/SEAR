@@ -9,4 +9,3 @@ clean_duplicates.smi(smi, smiles = "smiles", compound = "compound")
 \description{
 Remove duplicate entries in a smiles dataset
 }
-

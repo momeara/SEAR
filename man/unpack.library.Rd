@@ -21,4 +21,3 @@ returns: list(molecules, targets, fit) where
   fit is a list of this form
 Note: the molecules and targets tables are joined on the compound in the molecules and targets is the join column
 }
-

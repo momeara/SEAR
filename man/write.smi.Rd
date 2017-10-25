@@ -12,4 +12,3 @@ write.smi(smi, fname, smiles = "smiles", compound = "compound",
 \description{
 filter unique compound identifiers
 }
-

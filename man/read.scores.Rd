@@ -9,4 +9,3 @@ read.scores(fname, use_cache = T)
 \description{
 Read a scores file
 }
-

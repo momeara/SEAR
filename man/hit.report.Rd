@@ -11,4 +11,3 @@ hit.report(hits)
 Generate a hit report using the BioChemPantry
 scores is a data.frame with columns target1, target2 as uniprot_entries
 }
-

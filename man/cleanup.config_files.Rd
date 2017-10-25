@@ -10,4 +10,3 @@ cleanup.config_files(dir = getwd(), fitcore = TRUE, fpcore = TRUE,
 \description{
 Cleanup SEA config files
 }
-

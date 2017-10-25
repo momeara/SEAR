@@ -12,4 +12,3 @@ list
 \description{
 Parse SEA Fit file
 }
-

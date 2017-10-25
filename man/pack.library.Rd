@@ -11,4 +11,3 @@ pack.library(molecules, targets, library_fname = NULL,
 \description{
 Pack a SEA library
 }
-

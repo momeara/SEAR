@@ -14,4 +14,3 @@ Read a set file
 returns data.frame with columns [target, name, compound]
 if unpack_compounds, put each compound on separate row
 }
-

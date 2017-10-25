@@ -11,4 +11,3 @@ read.smi(fname, smiles = "smiles", compound = "compound")
 Read a smiles file
 returns data.frame with columns [smiles, compound]
 }
-

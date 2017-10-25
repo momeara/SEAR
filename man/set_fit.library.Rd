@@ -16,4 +16,3 @@ diagnostics_fname the file <diagnostics_fname>.dist should exist it is generated
 \description{
 Set the library fit
 }
-

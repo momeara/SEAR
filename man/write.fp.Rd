@@ -9,4 +9,3 @@ write.fp(fp, fname, fingerprint = "fingerprint", compound = "compound")
 \description{
 Write a fingerprints file
 }
-

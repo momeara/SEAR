@@ -87,12 +87,53 @@ clean_duplicates.smi <- function(smi, smiles="smiles", compound="compound"){
 #' Read a smiles file
 #' returns data.frame with columns [smiles, compound]
 #' @export
-read.smi <- function(fname, smiles="smiles", compound="compound"){
+read.smi <- function(
+	fname, smiles="smiles",
+	compound="compound",
+	fingerprint=NULL,
+	data=NULL,
+	check_duplicates=TRUE
+){
 	if(!is.character(fname) | !file.exists(fname)){
-		stop(paste("ERROR: The SEA .smi file, '", fname, "', does not exist.", sep=""))
+		stop(paste("ERROR: The SEA smiles file, '", fname, "', does not exist.", sep=""))
 	}
-	readr::read_delim(fname, delim=";", col_names=c(smiles, compound)) %>%
-		check_duplicates.smi
+	col_names <<- c('molecule id', 'compound')
+	if(is.null(fingerprint)){
+		col_types <<- cols(
+			`molecule id`=col_character(),
+			compound=col_character())
+	} else {
+		col_names <<- c(col_names, 'fingerprint')
+		if(is.null(data)){
+			col_types <<- cols(
+				`molecule id`=col_character(),
+				compound=col_character(),
+				fingerprint=col_character())
+		} else {
+			col_names <<- c(col_names, data)
+			col_types <<- NULL # try to infer from data
+		}
+	}
+	results <- readr::read_delim(
+		fname,
+		delim=";",
+		col_names=col_names,
+		col_types=col_types,
+		skip=1) %>%
+		dplyr::rename(
+			!!smiles := `molecule id`,
+			!!compound := compound)
+
+	if(!is.null(fingerprint)){
+		results <- results %>%
+			dplyr::rename(
+				!!fingerprint := fingerprint)
+	}
+
+	if(check_duplicates){
+		results <- results %>% check_duplicates.smi(smiles=smiles, compound=compound)
+	}
+	results
 }
 
 #' Combine compounds together, removing duplicates
@@ -124,6 +165,8 @@ write.smi <- function(
 	fname,
 	smiles="smiles",
 	compound="compound",
+	fp=NULL,
+	data=NULL,
 	seaware_format=T,
 	verbose=F){
 
@@ -131,8 +174,14 @@ write.smi <- function(
 		cat("Writing smiles data frame to '", fname, "':\n", sep="")
 		cat("\tsmiles column: ", smiles, "\n", sep="")
 		cat("\tcompound column: ", compound, "\n", sep="")
+		if(!is.null(fp)){
+			cat("\tfp column: ", fp, "\n", sep="")
+		}
+		if(!is.null(data)){
+			cat("\tdata columns: ", paste0(data, collapse=", ") , "\n", sep="")
+		}
 		if(seaware_format){
-			cat("\tusing the seaware format <cid>,<smiles>\n")
+			cat("\tusing the seaware format <cid>,<smiles>[,<fp>,[<data_columns>]]\n")
 		} else{
 			cat("\tusing the legacy format <smiles>;<cid>\n")
 		}
@@ -156,11 +205,16 @@ write.smi <- function(
 
 	check_column <- function(col_type, col_name){
 		if( !(col_name %in% names(smi))){
-			if(seware_format){
+			if(seaware_format){
 				stop(paste0(
 					"ERROR: cannot write smiles file '", fname, "' because the input data.frame does not have column ", col_type, " having name '", col_name, "'\n",
 					"ERROR:    input data.frame has columns: [", paste(names(smi), collapse=", "), "]\n",
-					"ERROR:    required columns for seaware smiles format: [", compound, ", ", smiles, "]"))
+					"ERROR:    columns for seaware smiles format: [",
+						compound, ", ",
+						smiles,
+						ifelse(!is.null(fp), paste0(", ", fp), ''),
+						ifelse(!is.null(data), paste0(", ", paste0(data, collapse=", ")), ''),
+						"]"))
 			} else {
 				stop(paste0(
 					"ERROR: cannot write .smi file '", fname, "' because the input data.frame does not have column ", col_type, " having name '", col_name, "'\n",
@@ -182,16 +236,41 @@ write.smi <- function(
 
 	check_column("compound", compound)
 	check_column("smiles", smiles)
+	if(!is.null(fp)){
+		check_column("fp", smiles)
+	}
+	if(!is.null(data)){
+		if(is.null(fp)){
+			if(verbose){
+				cat("\tData fields present but no fp column, so setting it to '' ...\n")
+			}
+			smi <- smi %>% dplyr::mutate(fp='')
+		}
+	}
+	if(verbose){
+		cat("\tChecking if writing out smiles files with duplicate compounds:\n")
+	}
 	check_duplicates.smi(smi=smi, smiles=smiles, compound=compound)
 
 	if(seaware_format){
+		col_names <- c("molecule id", "smiles")
+		columns <- c(compound, smiles)
+		if(!is.null(fp)){
+			columns <- c(columns, fp)
+			col_names <- c(col_names, "fp")
+		}
+		if(!is.null(data)){
+			columns <- c(columns, data)
+			col_names <- c(col_names, data)
+		}
+
 		write.table(
-			as.data.frame(smi)[,c(compound, smiles)],
+			as.data.frame(smi)[,columns],
 			fname,
 			quote=T,
 			sep=",",
 			row.names=F,
-			col.names=c("molecule id", "smiles"))
+			col.names=col_names)
 	} else {
 		write.table(
 			as.data.frame(smi)[, c(smiles,compound)],
@@ -241,9 +320,11 @@ pack.library <- function(
 	molecules,
 	targets,
 	library_fname = NULL,
-	fingerprint_type="rdkit_ecfp4",
+	fingerprint_type="rdkit_ecfp",
 	name=NULL,
 	config_files = NULL,
+	write.smi_args=list(),
+	write.set_args=list(),
 	verbose=F){
 
 	tmp_base <- tempfile()
@@ -256,11 +337,12 @@ pack.library <- function(
 	if(verbose){
 		cat("Writing molecules to '", molecules_fname, "' ...\n", sep="")
 	}
-	write.smi(molecules, molecules_fname)
+	do.call(write.smi, c(list(smi=molecules, fname=molecules_fname), write.smi_args))
+
 	if(verbose){
 		cat("Writing targets to '", targets_fname, "' ...\n", sep="")
 	}
-	write.set(targets, targets_fname)
+	do.call(write.set, c(list(set=targets, fname=targets_fname), write.set_args))
 
 	if(!is.null(config_files)){
 		if(verbose){
@@ -270,7 +352,7 @@ pack.library <- function(
 	}
 
 	cmd <- paste(
-		"SeaShell library pack",
+		"SeaShell.py library pack",
 		"--generate-fingerprint", fingerprint_type,
 		ifelse(!is.null(name), paste0("--name=", shQuote(name)), ""),
 		library_fname, molecules_fname, targets_fname)
@@ -294,12 +376,12 @@ parse_fit_file <- function(fit_file){
 		stringr::str_split("\t") %>%
 		magrittr::extract2(1) %>%    # flatten matches
 		magrittr::extract(-1) %>%    # remove line tag
-		purrr::map(as.numeric) %>%
-		purrr::flatten_dbl()
+		purrr::map(as.numeric) %>%   # convert to floats
+		purrr::flatten_dbl()         # convert list to vector
 	list(
 		tanimoto_threshold = x[4] %>% parse_line,
 		mu = x[5] %>% parse_line,
-		sigma = x[5] %>% parse_line)
+		sigma = x[6] %>% parse_line)
 }
 
 #' Unpack a SEA library
@@ -319,7 +401,7 @@ unpack.library <- function(
 	verbose=FALSE){
 
 	if(!is.character(fname) | !file.exists(fname)){
-		stop(paste0("ERROR: The SEA .smi file, '", fname, "', does not exist."))
+		stop(paste0("ERROR: The SEA .sea file, '", fname, "', does not exist."))
 	}
 
 	if(is.null(molecules_fname)){
@@ -335,7 +417,7 @@ unpack.library <- function(
 	}
 
 	cmd <- paste(
-			"SeaShell library unpack --yes --fingerprint-format", fingerprint_format,
+			"SeaShell.py library unpack --yes --fingerprint-format", fingerprint_format,
 			fname, molecules_fname, targets_fname, fit_fname)
 	if(verbose){
 			cat("Unpacking targets and molecules form '", fname, "'\n", sep="")
@@ -378,7 +460,7 @@ plot_fits.library <- function(
 		cat("Making background ...\n")
 	}
 	cmd <- paste(
-		"SeaShell library fit --yes",
+		"SeaShell.py library fit --yes",
 		"--plot", diagnostics_fname,
 		library_fname)
 
@@ -406,7 +488,7 @@ set_fit.library <- function(
 	verbose=F){
 
 	cmd <- paste(
-		"SeaShell library fit --yes",
+		"SeaShell.py library fit --yes",
 		"--select", threshold, diagnostics_fname,
 		library_fname)
 	if(verbose){
@@ -483,7 +565,7 @@ write.set <- function(
 
 	check_column <- function(col_type, col_name){
 		if( !(col_name %in% names(set))){
-			if(seware_format){
+			if(seaware_format){
 				stop(paste0(
 					"ERROR: cannot write .set file '", fname, "' because the input data.frame does not have column ", col_type, " having name '", col_name, "'\n",
 					"ERROR:    input data.frame has columns: [", paste(names(set), collapse=", "), "]\n",
@@ -532,7 +614,6 @@ write.set <- function(
 	}
 }
 
-
 #' create a fingerprint file
 #' given file or data frame with columns [compound, smiles]
 #' return based on the read parameter
@@ -547,12 +628,22 @@ create.fp <- function(
 	standardize=T,
 	verbose=F){
 
+	if(verbose){
+		cat("Preparing smi_file ...\n")
+	}
 	if(is.character(smi)){
 		smi_fname <- smi
+		if(verbose){
+			cat("\tusing provided smiles file: '", smi_fname, "'\n", sep="")
+		}
 	} else if(is.data.frame(smi)){
-		smi_fname <- paste0(tempfile(), ".smi")
-		write.smi(smi, smi_fname, compound=compound, smiles=smiles, seaware_format=T, verbose)
-		cat("DONE\n")
+		smi_fname <- paste0(tempfile(), ".csv")
+		if(verbose){
+			cat("\tWriting data.frame out to smiles file: '", smi_fname, "'\n", sep="")
+		}
+
+		write.smi(smi, smi_fname, compound=compound, smiles=smiles, seaware_format=T, verbose=verbose)
+		cat("\tDONE\n")
 	} else{
 		cat("ERROR: unrecognized smi class: ", paste0(class, collapse=", "), "\n", sep="")
 	}
@@ -560,15 +651,15 @@ create.fp <- function(
 	if(is.null(output_fname)){
 		output_fname <- tempfile()
 	}
-	fp_format <- match.args(fp_format)
-	fp_type <- match.args(fp_type)
+	fp_format <- match.arg(fp_format)
+	fp_type <- match.arg(fp_type)
 
 	if(verbose){
 		cat("Writing a ", fp_format, " ", fp_type, " fingerprint file to '", output_fname, "'...\n", sep="")
 	}
 
 	cmd <- paste0(
-		"SeaShell fingerprint ",
+		"SeaShell.py fingerprint ",
 		"--to-format ", fp_format, " ",
 		ifelse(standardize, '', '--skip-standardization '),
 		"--generate-fingerprint ", fp_type, " ",
@@ -797,6 +888,138 @@ run.sea <- function(
 	scores <- read.scores(paste0(output_base, "/sea.scores.csv"))
 }
 
+
+#' Compute a sparse TC matrix between query and reference compounds with values above the Tc cutoff
+#' ref_fp: Either
+#'    a) path to a fingerprints file as generated with create.fp
+#'    b) data.frame with given column <ref_compound> and <ref_smiles>.
+#' query_fp: Either
+#'    a) path to a fingerprints file as generated with create.fp
+#'    b) data.frame with given column <ref_compound> and <ref_smiles>.
+#' Requires seaware-academic to be loaded
+#' returns data.frame with columns <compound>, <MaxTC> for all query compounds with Tc >= cuttoff  of a reference compound
+#' @export
+tc_matrix <- function(
+	ref_fp,
+	query_fp,
+	cutoff = 0,
+	output_fname=NULL,
+	ref_compound="compound",
+	ref_smiles="smiles",
+	query_compound="compound",
+	query_smiles="smiles",
+	verbose=FALSE,
+	...
+){
+	input_base <- tempdir()
+
+	if(verbose){
+		cat("Preparing reference fingerprint file ...\n")
+	}
+
+	if(is.character(ref_fp)){
+		ref_fp_fname <- ref_fp
+		if(verbose){
+			cat("\tusing provided fingerprint file: '", ref_fp_fname, "'\n", sep="")
+		}
+	} else if(is.data.frame(ref_fp)){
+		ref_fp_fname <- paste0(input_base, "/ref.csv")
+		if(verbose){
+			cat("\tUsing data.frame to create fingerprint file '", ref_fp_fname, "'\n", sep="")
+		}
+		create.fp(ref_fp, ref_fp_fname, compound=ref_compound, smiles=ref_smiles, verbose=verbose, ...)
+		cat("\tDONE\n")
+	} else{
+		cat("ERROR: unrecognized smi class: ", paste0(class, collapse=", "), "\n", sep="")
+	}
+
+	if(verbose){
+		cat("Preparing query fingerprint file ...\n")
+	}
+
+	if(is.character(query_fp)){
+		if(verbose){
+			cat("\tUsing provided fingerprint file: '", ref_fp_fname, "'\n", sep="")
+		}
+		query_fp_fname <- query_fp
+	} else if(is.data.frame(query_fp)){
+		query_fp_fname <- paste0(input_base, "/query.csv")
+		if(verbose){
+			cat("\tUsing data.frame to create fingerprint file '", query_fp_fname, "'\n", sep="")
+		}
+		create.fp(query_fp, query_fp_fname, compound=query_compound, smiles=query_smiles, ...)
+		cat("\tDONE\n")
+	} else{
+		cat("ERROR: unrecognized smi class: ", paste0(class, collapse=", "), "\n", sep="")
+	}
+
+	if(is.null(output_fname)){
+		output_fname <- paste0(tempfile(), ".tsv")
+		if(verbose){
+			cat("Writing temporary output to '", output_fname, "'\n", sep="")
+		}
+	}
+
+	cmd <- paste(
+		"tc_matrix.py",
+		ref_fp_fname,
+		query_fp_fname,
+		cutoff,
+		output_fname)
+	cat(cmd, "\n", sep="")
+	system(cmd)
+	tcs <- readr::read_tsv(
+		output_fname,
+		col_types=readr::cols(
+			ref_cid=readr::col_character(),
+			query_cid=readr::col_character(),
+			tc=readr::col_double()))
+}
+
+#' Generate svg images for each compound
+#' @export
+generate_images <- function(
+	smi,
+	smiles='smiles',
+	compound='compound',
+	verbose=F,
+	batch_size = 1000){
+
+	smi_fname <- paste0(tempfile(), ".csv")
+	output_fname <- paste0(tempfile(), ".csv")
+
+	smi_with_images <- smi %>%
+		dplyr::group_by(.batch=rep(1:ceiling(n()/batch_size), length.out=n())) %>%
+		dplyr::do({
+			write.smi(
+				smi=.,
+				fname=smi_fname,
+				smiles=smiles,
+				compound=compound,
+				seaware_format=TRUE,
+				verbose=verbose)
+			cmd <- paste("illustrate_molecules.py", smi_fname, output_fname)
+			if (verbose){
+				cat("Batch ", .$.batch[1], ": ", cmd, "\n", sep="")
+			}
+			return_val <- system(cmd)
+			read.smi(
+				fname=output_fname,
+				smiles=smiles,
+				compound=compound,
+				fingerprint='fingerprint',
+				data='image',
+				check_duplicates=FALSE) %>%
+			dplyr::select(-fingerprint)
+		}) %>%
+		dplyr::ungroup() %>%
+		dplyr::select(-.batch)
+
+	file.remove(smi_fname)
+	file.remove(output_fname)
+
+	smi_with_images
+}
 
 
 #' Locate the SEA viewer

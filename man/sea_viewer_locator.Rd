@@ -18,4 +18,3 @@ sea_locator_url: url to the locate_association.php script
  return:
     a character vector of urls into the SEA viewer
 }
-

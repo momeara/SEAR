@@ -39,4 +39,3 @@ zz <- z \%>\% verify(no_duplicates(a,b,c))
 \seealso{
 \code{\link{duplicated}}
 }
-

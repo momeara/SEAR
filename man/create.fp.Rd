@@ -16,4 +16,3 @@ create a fingerprint file
 given file or data frame with columns [compound, smiles]
 return based on the read parameter
 }
-

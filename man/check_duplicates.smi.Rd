@@ -9,4 +9,3 @@ check_duplicates.smi(smi, smiles = "smiles", compound = "compound")
 \description{
 check that the smiles and compound columns are unique
 }
-

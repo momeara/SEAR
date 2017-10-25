@@ -33,4 +33,3 @@ Output:
   data.frame with columns [target1, target2, EValue, MaxTC] for SEA associations
 export
 }
-

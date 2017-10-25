@@ -9,4 +9,3 @@ write.scores(scores, fname)
 \description{
 Write a scores file
 }
-

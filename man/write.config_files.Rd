@@ -18,4 +18,3 @@ for one of the sea config files.
 these are written to the current working directory so they can be parsed
 so as to take presidence over other specified configuration options
 }
-

@@ -17,4 +17,3 @@ INPUT:
 OUTPUT:
   data.frame: columns of smis and column <set>
 }
-

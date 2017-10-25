@@ -10,4 +10,3 @@ write.singleton.set(smi, fname, target = "compound", name = "compound",
 \description{
 Write a singleton sets file
 }
-
