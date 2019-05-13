@@ -5,7 +5,8 @@
 \title{Read a smiles file
 returns data.frame with columns [smiles, compound]}
 \usage{
-read.smi(fname, smiles = "smiles", compound = "compound")
+read.smi(fname, smiles = "smiles", compound = "compound",
+  fingerprint = NULL, data = NULL, check_duplicates = TRUE)
 }
 \description{
 Read a smiles file

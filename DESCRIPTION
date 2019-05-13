@@ -20,7 +20,9 @@ Imports:
     readr,
     stringr,
     tidyr,
+    fdrtool,
 License: MIT + file LICENSE
 Collage: 'r_utils.R'
     'io.R'
+    'compute_sea_scores.R'
 RoxygenNote: 6.0.1

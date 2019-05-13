@@ -5,6 +5,7 @@ src/*.o-*
 .RData
 .Rproj.user
 .Rhistory
+Rplots.pdf
 inst/doc
 .httr-oauth
 *.Rds

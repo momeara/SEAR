@@ -14,7 +14,8 @@ returns data.frame with columns <compound>, <MaxTC> for all query compounds with
 \usage{
 tc_matrix(ref_fp, query_fp, cutoff = 0, output_fname = NULL,
   ref_compound = "compound", ref_smiles = "smiles",
-  query_compound = "compound", query_smiles = "smiles", verbose = F, ...)
+  query_compound = "compound", query_smiles = "smiles", verbose = FALSE,
+  ...)
 }
 \description{
 Compute a sparse TC matrix between query and reference compounds with values above the Tc cutoff

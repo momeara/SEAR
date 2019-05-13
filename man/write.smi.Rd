@@ -6,8 +6,8 @@
 input data.frame with columns [smiles, compound]
 write .smi file to given fname}
 \usage{
-write.smi(smi, fname, smiles = "smiles", compound = "compound",
-  seaware_format = T, verbose = F)
+write.smi(smi, fname, smiles = "smiles", compound = "compound", fp = NULL,
+  data = NULL, seaware_format = T, verbose = F)
 }
 \description{
 filter unique compound identifiers

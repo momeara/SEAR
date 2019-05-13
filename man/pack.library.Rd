@@ -5,8 +5,8 @@
 \title{Pack a SEA library}
 \usage{
 pack.library(molecules, targets, library_fname = NULL,
-  fingerprint_type = "rdkit_ecfp4", name = NULL, config_files = NULL,
-  verbose = F)
+  fingerprint_type = "rdkit_ecfp", name = NULL, config_files = NULL,
+  write.smi_args = list(), write.set_args = list(), verbose = F)
 }
 \description{
 Pack a SEA library
